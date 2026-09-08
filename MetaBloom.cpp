@@ -1,6 +1,6 @@
 #include "include/CLI11.hpp"
-#include "src/Index.h"
 #include "src/Config.h"
+#include "src/IBFIndex.h"
 
 int main(int argc, char** argv) 
 {
@@ -40,7 +40,7 @@ int main(int argc, char** argv)
     {
         std::cout << "Building index from: " << config.index << std::endl;
         // Call the function to build the index
-        IBF_Index index;
+        IBFIndex index(config);
         std::cout << "Output index saved to: " << config.output << std::endl;
     }
 }
