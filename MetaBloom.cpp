@@ -1,6 +1,11 @@
 #include "include/CLI11.hpp"
 #include "src/Config.h"
 #include "src/IBFIndex.h"
+#include "src/MspReader.h"
+#include "src/Spectrum.h"
+
+#include <map>
+#include <iostream>
 
 int main(int argc, char** argv) 
 {
@@ -23,7 +28,7 @@ int main(int argc, char** argv)
     // Querying
     auto* query_cmd = app.add_subcommand("query", "Query an existing index");
 
-    query_cmd->add_option("-i --index", config.index, "Path to the index")->required();
+    query_cmd->add_option("-i, --index", config.index, "Path to the index")->required();
     query_cmd->add_option("-q, --query", config.query, "Query spectra")->required();
     query_cmd->add_option("-o, --output", config.output, "Path to the output index")->required();
 
@@ -38,9 +43,19 @@ int main(int argc, char** argv)
 
     if (index_cmd->parsed()) 
     {
-        std::cout << "Building index from: " << config.index << std::endl;
-        // Call the function to build the index
-        IBFIndex index(config);
-        std::cout << "Output index saved to: " << config.output << std::endl;
+        MspReader reader(config.index);
+        Spectrum spectrum;
+
+        std::map<std::string, size_t> index;
+
+        while (reader.next(spectrum)) 
+        {
+            index[spectrum.protein_name]++;
+        }
+
+        for (const auto& [protein, count] : index) 
+        {
+            std::cout << protein << ": " << count << " spectra" << std::endl;
+        }
     }
 }
